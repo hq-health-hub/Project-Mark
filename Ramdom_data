@@ -1,0 +1,108 @@
+import random
+from datetime import datetime, timedelta
+import string
+import os
+
+def generate_patient_data(num_patients=100):
+    """Generate random patient data similar to the format shown"""
+    
+    # Sample data for generating random values
+    first_names = ["John", "Jane", "Michael", "Sarah", "David", "Lisa", "Robert", "Emily", 
+                   "James", "Jessica", "William", "Ashley", "Christopher", "Amanda", "Daniel", "Michelle"]
+    
+    last_names = ["Smith", "Johnson", "Williams", "Brown", "Jones", "Garcia", "Miller", "Davis", 
+                  "Rodriguez", "Martinez", "Hernandez", "Lopez", "Gonzalez", "Wilson", "Anderson", "Thomas"]
+    
+    genders = ["M", "F"]
+    consent_responses = ["Granted", "never done"]
+    last_two_fields_responses = ["true", ""]  # Either "true" or empty
+    
+    patients = []
+    
+    for i in range(num_patients):
+        # Generate patient ID (5-digit number)
+        patient_id = random.randint(16200, 16500)
+        
+        # Generate random names
+        first_name = random.choice(first_names)
+        last_name = random.choice(last_names)
+        
+        # Generate random phone number (some entries should be empty)
+        if random.choice([True, False, False]):  # 1/3 chance of having phone
+            phone = f"{random.randint(100, 999)}-555-5555"
+        else:
+            phone = ""
+        
+        # Generate random birthdate
+        start_date = datetime(1980, 1, 1)
+        end_date = datetime(2010, 12, 31)
+        random_date = start_date + timedelta(days=random.randint(0, (end_date - start_date).days))
+        birthdate = random_date.strftime("%Y/%m/%d")
+        
+        # Generate random gender
+        gender = random.choice(genders)
+        
+        # Generate consent response
+        consent = random.choice(consent_responses)
+        
+        # Generate responses for last 2 fields - either "true" or empty
+        demog_sms = random.choice(last_two_fields_responses)
+        confirm_sms_pin = random.choice(last_two_fields_responses)
+        
+        # Create patient record - using actual names
+        patient = [
+            str(patient_id),    # Patient #
+            first_name,         # First Name (actual first name)
+            last_name,          # Surname (actual last name)
+            phone,              # Mobile Phone
+            birthdate,          # Birthdate
+            gender,             # Sex
+            consent,            # @TextMessageConsent
+            demog_sms,          # Demog SMS PIN
+            confirm_sms_pin     # Confirm SMS PIN
+        ]
+        
+        patients.append(patient)
+    
+    return patients
+
+def write_to_file(patients, filename="patient_data.txt"):
+    """Write patient data to a tab-delimited file"""
+    
+    # Header row - matching exactly what's shown in the image
+    headers = [
+        "Patient #",
+        "First Name",
+        "Surname",
+        "Mobile Phone",
+        "Birthdate",
+        "Sex",
+        "@TextMessageConsent",
+        "Demog SMS PIN",
+        "Confirm SMS PIN"
+    ]
+    
+    with open(filename, 'w', encoding='utf-8') as file:
+        # Write headers
+        file.write('\t'.join(headers) + '\n')
+        
+        # Write patient data
+        for patient in patients:
+            file.write('\t'.join(patient) + '\n')
+    
+    print(f"File '{filename}' created successfully with {len(patients)} patient records!")
+
+# Generate and save the data
+if __name__ == "__main__":
+    # Generate 50 random patients
+    patient_data = generate_patient_data(50)
+    
+    # Define save location with proper filename
+    save_directory = r"C:\Users\BGoulart\HQToronto\Shared Docs - General\Clinical Reporting\ReportingProjects\Data\NewData\2025-10-27"
+    save_path = os.path.join(save_directory, "random_patient_data.txt")
+    
+    # Create directory if it doesn't exist
+    os.makedirs(save_directory, exist_ok=True)
+    
+    # Write to file
+    write_to_file(patient_data, save_path)
